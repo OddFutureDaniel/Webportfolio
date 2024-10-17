@@ -1,11 +1,28 @@
 import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Home from './components/Home';
+import About from './components/About';
+import Projects from './components/Projects';
+import Contact from './components/Contact';
+// import Admin from './Admin';
+import Navigation from './components/Navigation';  // Import Navigation component
 
 function App() {
   return (
-    <div>
-      <h1>Welcome to My Portfolio!</h1>
-      <p>This is where I'll showcase my projects and skills.</p>
-    </div>
+    <>
+      <Navigation />  {/* Use the Navigation component */}
+
+      {/* Render the sections on the same page */}
+      <Home />
+      <About />
+      <Projects />
+      <Contact />
+
+      {/* Admin route */}
+      {/* <Routes>
+        <Route path="/admin" element={<Admin />} />
+      </Routes> */}
+    </>
   );
 }
 
