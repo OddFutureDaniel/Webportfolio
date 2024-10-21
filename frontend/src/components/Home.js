@@ -6,7 +6,7 @@ function Home() {
       id="home"
       className="relative w-full h-screen bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `url('/IMG_0170.jpg')`, // Set your image as the background
+        backgroundImage: `url('/IMG_0115.jpg')`, // Set your image as the background
       }}
     >
       {/* Overlay to darken the background for better text readability */}
@@ -17,7 +17,7 @@ function Home() {
         <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-7xl">
           Welcome to My Portfolio
         </h1>
-        <p className="mt-8 text-lg leading-8 text-gray-300 sm:text-xl">
+        <p className="mt-8 text-lg leading-8 text-gray-300 sm:text-xl font-roboto-slab">
           Discover my projects, experience, and skills. Let's create something amazing together!
         </p>
 

@@ -39,7 +39,7 @@ function App() {
 
       {/* Main content */}
       <main>
-        <section id="home" className="p-10 bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
+        <section id="home" className=" bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
           <Home />
         </section>
         <section id="about" className="p-10 bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">

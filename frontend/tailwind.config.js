@@ -7,6 +7,10 @@ module.exports = {
     extend: {
       fontFamily: {
         'lato': ['Lato', 'sans-serif'],  // Add Lato as a font family
+        'roboto-slab': ['"Roboto Slab"', 'serif'], // Add Roboto Slab as a custom font
+      },
+      colors: {
+        'tertiary-purple': '#5D5A88', // Add the custom color
       },
     },
   },
