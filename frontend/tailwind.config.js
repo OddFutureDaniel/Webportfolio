@@ -11,4 +11,6 @@ module.exports = {
     },
   },
   plugins: [],
+  darkMode: 'class', // Enables class-based dark mode
+  // Other configurations...
 };
