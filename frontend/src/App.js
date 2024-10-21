@@ -39,16 +39,16 @@ function App() {
 
       {/* Main content */}
       <main>
-        <section id="home" className=" bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
+        <section id="home" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
           <Home />
         </section>
-        <section id="about" className="p-10 bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
+        <section id="about" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
           <About />
         </section>
-        <section id="projects" className="p-10 bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
+        <section id="projects" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
           <Projects />
         </section>
-        <section id="contact" className="p-10 bg-white dark:bg-gray-900 shadow-md rounded-lg mb-10">
+        <section id="contact" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
           <Contact />
         </section>
       </main>

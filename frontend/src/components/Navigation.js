@@ -29,8 +29,9 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
 
       // Detect if the scroll is past the Home section
       const homeSectionHeight = document.getElementById('home').offsetHeight;
-      if (currentScrollPos >= homeSectionHeight) {
-        setIsPastHome(true); // Scrolled past home
+      const offset = 50; // Offset to trigger the blur earlier
+      if (currentScrollPos >= homeSectionHeight - offset) {
+        setIsPastHome(true); // Scrolled past (with offset)
       } else {
         setIsPastHome(false); // Still in the home section
       }

@@ -9,3 +9,7 @@
 body {
   font-family: 'Lato', sans-serif;
 }
+/* Add this to your global CSS file */
+html {
+  scroll-behavior: smooth;
+}
