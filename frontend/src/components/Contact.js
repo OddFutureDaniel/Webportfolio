@@ -22,6 +22,20 @@ function Contact() {
           danielmatt@hotmail.co.uk
         </a>
       </p>
+
+
+      {/* CV Link */}
+      <p className="text-[1rem] text-gray-900 dark:text-white text-center">
+        My CV <span role="img" aria-label="document">📄</span>:{' '}
+        <a
+          href="https://OddFutureDaniel.github.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-tertiary-purple hover:underline"
+        >
+          https://OddFutureDaniel.github.io
+        </a>
+      </p>
     </section>
   );
 }

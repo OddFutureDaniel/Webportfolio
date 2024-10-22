@@ -6,7 +6,7 @@ function Projects() {
     {
       title: 'Web Portfolio V2',
       image: '/webportfoliov2.png',
-      keywords: ['React', 'Tailwind', 'JavaScript'],
+      keywords: ['React', 'Tailwind','Postman','TypeORM'],
       link: '#'
     },
     {

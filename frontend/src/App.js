@@ -1,59 +1,69 @@
-import React, { useState, useEffect } from 'react'
-import Home from './components/Home'
-import About from './components/About'
-import Projects from './components/Projects'
-import Contact from './components/Contact'
-import Navigation from './components/Navigation'
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './components/Home';
+import About from './components/About';
+import Projects from './components/Projects';
+import Contact from './components/Contact';
+import Admin from './pages/Admin';
+import Navigation from './components/Navigation';
+import LoginModal from './components/LoginModal';
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem('jwtToken')); // Store JWT token
 
-  // Load theme preference from localStorage and apply it on initial render
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'dark') {
-      setIsDarkMode(true)
-      document.documentElement.classList.add('dark') // Add 'dark' class to <html>
-    } else {
-      setIsDarkMode(false)
-      document.documentElement.classList.remove('dark') // Remove 'dark' class from <html>
-    }
-  }, [])
-
-  // Toggle dark mode and save preference to localStorage
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode)
-    if (!isDarkMode) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const handleLogin = (jwtToken) => {
+    setToken(jwtToken); // Store token after login
+    localStorage.setItem('jwtToken', jwtToken);
+  };
+
+  const openLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
-      {/* Pass toggle function and current state to Navigation */}
-      <Navigation isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+    <Router>
+      <div className={`App ${isDarkMode ? 'dark' : ''}`}>
+        <Routes>
+          {/* Route for portfolio */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Navigation
+                  isDarkMode={isDarkMode}
+                  toggleDarkMode={toggleDarkMode}
+                  openLoginModal={openLoginModal}
+                />
+                <div id="home"><Home /></div>
+                <div id="about"><About /></div>
+                <div id="projects"><Projects /></div>
+                <div id="contact"><Contact /></div>
+                {isLoginModalOpen && (
+                  <LoginModal onClose={closeLoginModal} onLogin={handleLogin} />
+                )}
+              </>
+            }
+          />
 
-      {/* Main content */}
-      <main>
-        <section id="home" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
-          <Home />
-        </section>
-        <section id="about" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
-          <About />
-        </section>
-        <section id="projects" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
-          <Projects />
-        </section>
-        <section id="contact" className="bg-white dark:bg-gray-900 shadow-md rounded-lg">
-          <Contact />
-        </section>
-      </main>
-    </div>
-  )
+          {/* Route for Admin page */}
+          <Route
+            path="/admin"
+            element={token ? <Admin /> : <Home />} // Show Admin page if authenticated, otherwise Home
+          />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;

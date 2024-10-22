@@ -8,6 +8,22 @@ const projectRepository = AppDataSource.getRepository(Project);
 const userRepository = AppDataSource.getRepository(User);
 const SECRET_KEY = 'your_secret_key';  // Use the same secret key as before
 
+export const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers['authorization'];  // Check the authorization header
+  if (!authHeader) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];  // Extract token from "Bearer <token>"
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);  // Verify token using the secret key
+    req.userId = decoded.id;  // Attach user ID to request
+    next();  // Proceed to the next middleware or route handler
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid or expired token' });
+  }
+};
+
 // Project Controllers
 export const getProjects = async (req, res) => {
   try {
@@ -132,3 +148,35 @@ export const login = async (req, res) => {
       res.status(500).json({ message: 'Error logging in', error: error.message });
     }
   };
+
+  // Get User by ID
+export const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find user by ID
+    const user = await userRepository.findOneBy({ id: parseInt(id) });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);  // Return the user data
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving user', error: error.message });
+  }
+};
+
+export const getUserByUsername = async (req, res) => {
+  const { username } = req.params;
+  
+  console.log('Searching for user with username:', username); // Log the username for debugging
+  
+  try {
+    const user = await userRepository.findOneBy({ username });
+    if (!user) {
+      return res.status(404).json({ message: `User with username "${username}" not found` });
+    }
+    res.status(200).json(user);  // Return the found user
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving user', error: error.message });
+  }
+};
