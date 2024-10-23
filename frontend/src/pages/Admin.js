@@ -3,27 +3,27 @@ import axios from 'axios';
 
 function Admin() {
   const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ name: '', description: '', url: '' });
+  const [newProject, setNewProject] = useState({ name: '', description: '', url: '', keywords: '' });
   const [editingProject, setEditingProject] = useState(null);
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState(null); // Store the project to be deleted
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const token = sessionStorage.getItem('authToken'); // Get token from sessionStorage
+        const token = sessionStorage.getItem('authToken');
         if (!token) {
           throw new Error('No token found');
         }
 
         const response = await axios.get('http://localhost:5050/api/projects', {
-          headers: { Authorization: `Bearer ${token}` }, // Attach token to Authorization header
+          headers: { Authorization: `Bearer ${token}` },
         });
         setProjects(response.data);
       } catch (err) {
         setError('Failed to fetch projects.');
-        console.error(err.response ? err.response.data : err.message); // Log error details
+        console.error(err.response ? err.response.data : err.message);
       }
     };
 
@@ -31,40 +31,51 @@ function Admin() {
   }, []);
 
   const handleCreateProject = async () => {
-    const { name, description, url } = newProject;
+    const { name, description, url, keywords } = newProject;
 
-    // Simple form validation
     if (!name || !description || !url) {
       setError('All fields are required.');
       return;
     }
 
     try {
-      const token = sessionStorage.getItem('authToken'); // Make sure the token is correct
-      const response = await axios.post('http://localhost:5050/api/projects', newProject, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = sessionStorage.getItem('authToken');
+      const keywordArray = keywords.split(',').map((keyword) => keyword.trim());
 
-      // Clear the form and update the project list
-      setNewProject({ name: '', description: '', url: '' });
+      const response = await axios.post('http://localhost:5050/api/projects', 
+        { name, description, url, keywords: keywordArray }, 
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setNewProject({ name: '', description: '', url: '', keywords: '' });
       setProjects([...projects, response.data]);
-      setError(null); // Clear any existing errors
+      setError(null);
     } catch (err) {
       setError('Failed to create project.');
-      console.error(err.response ? err.response.data : err.message); // Log the actual error message
+      console.error(err.response ? err.response.data : err.message);
     }
   };
 
   const handleEditProject = (project) => {
-    // Load the project into the editing state
     setEditingProject(project);
-    setNewProject({ name: project.name, description: project.description, url: project.url });
+
+    // Handle case where keywords are null or undefined
+    const keywordsString = project.keywords ? project.keywords.join(', ') : '';
+
+    setNewProject({ 
+      name: project.name, 
+      description: project.description, 
+      url: project.url,
+      keywords: keywordsString // Use empty string if no keywords
+    });
   };
 
   const handleUpdateProject = async () => {
     if (!editingProject) return;
 
-    const { name, description, url } = newProject;
+    const { name, description, url, keywords } = newProject;
     if (!name || !description || !url) {
       setError('All fields are required for updating.');
       return;
@@ -72,21 +83,23 @@ function Admin() {
 
     try {
       const token = sessionStorage.getItem('authToken');
+      const keywordArray = keywords.split(',').map((keyword) => keyword.trim());
+
       const response = await axios.put(`http://localhost:5050/api/projects/${editingProject.id}`, {
         name,
         description,
         url,
+        keywords: keywordArray,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update the project list
       const updatedProjects = projects.map((proj) =>
         proj.id === editingProject.id ? response.data : proj
       );
       setProjects(updatedProjects);
-      setEditingProject(null); // Clear the edit state
-      setNewProject({ name: '', description: '', url: '' });
+      setEditingProject(null);
+      setNewProject({ name: '', description: '', url: '', keywords: '' });
       setError(null);
     } catch (err) {
       setError('Failed to update project.');
@@ -95,8 +108,8 @@ function Admin() {
   };
 
   const handleDeleteClick = (project) => {
-    setProjectToDelete(project); // Set the project to be deleted
-    setIsDeleteModalOpen(true); // Open the delete confirmation modal
+    setProjectToDelete(project);
+    setIsDeleteModalOpen(true);
   };
 
   const handleDeleteProject = async () => {
@@ -108,10 +121,9 @@ function Admin() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update the project list after deletion
       setProjects(projects.filter((project) => project.id !== projectToDelete.id));
-      setIsDeleteModalOpen(false); // Close the modal after deletion
-      setProjectToDelete(null); // Clear the project to delete state
+      setIsDeleteModalOpen(false);
+      setProjectToDelete(null);
     } catch (err) {
       setError('Failed to delete project.');
       console.error(err.response ? err.response.data : err.message);
@@ -122,10 +134,8 @@ function Admin() {
     <div className="p-10">
       <h2 className="text-3xl mb-6">Admin Dashboard</h2>
 
-      {/* Error message display */}
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* Project creation/edit form */}
       <div className="mb-8">
         <h3 className="text-xl mb-4">{editingProject ? 'Edit Project' : 'Create a New Project'}</h3>
         <div className="space-y-4">
@@ -150,6 +160,13 @@ function Admin() {
             onChange={(e) => setNewProject({ ...newProject, url: e.target.value })}
             className="border border-gray-300 rounded-md p-2 w-full"
           />
+          <input
+            type="text"
+            placeholder="Keywords (comma separated)"
+            value={newProject.keywords}
+            onChange={(e) => setNewProject({ ...newProject, keywords: e.target.value })}
+            className="border border-gray-300 rounded-md p-2 w-full"
+          />
           {editingProject ? (
             <button
               onClick={handleUpdateProject}
@@ -168,7 +185,6 @@ function Admin() {
         </div>
       </div>
 
-      {/* Display existing projects */}
       <div>
         <h3 className="text-xl mb-4">Existing Projects</h3>
         <div className="space-y-6">
@@ -176,6 +192,7 @@ function Admin() {
             <div key={project.id} className="border border-gray-300 rounded-md p-4">
               <h3 className="text-lg font-semibold">{project.name}</h3>
               <p>{project.description}</p>
+              <p><strong>Keywords:</strong> {project.keywords ? project.keywords.join(', ') : 'No keywords'}</p> {/* Check for null/undefined */}
               <a
                 href={project.url}
                 target="_blank"
@@ -203,7 +220,6 @@ function Admin() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">

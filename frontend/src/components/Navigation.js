@@ -49,7 +49,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
   }, []);
 
   const handleLogin = (token) => {
-    localStorage.setItem('jwtToken', token);  // Store the JWT token in local storage
+    sessionStorage.setItem('authToken', token);  // Store the JWT token in session storage instead of local storage
     setIsLoginOpen(false);  // Close login modal after successful login
     window.location.href = '/admin';  // Redirect to admin page
   };

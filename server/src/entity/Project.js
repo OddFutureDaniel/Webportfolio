@@ -18,6 +18,10 @@ export const Project = new EntitySchema({
     url: {
       type: String,
     },
+    keywords: {
+      type: "simple-array", // Store as a comma-separated array
+      nullable: true,        // Allow null for existing projects
+    },
     createdAt: {
       type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",

@@ -34,21 +34,24 @@ export const getProjects = async (req, res) => {
   }
 };
 
+// Create Project
 export const createProject = async (req, res) => {
-  const { name, description, url } = req.body;
-  
-  if (!name || !description || !url) {
+  const { name, description, url, keywords } = req.body; // Get keywords from request
+
+  if (!name || !description || !url || !keywords) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
   try {
-    const newProject = projectRepository.create({ name, description, url });
+    // Assuming keywords is an array (from frontend)
+    const newProject = projectRepository.create({ name, description, url, keywords });
     await projectRepository.save(newProject);
     res.status(201).json(newProject);
   } catch (error) {
     res.status(500).json({ message: "Error creating project", error });
   }
 };
+
 
 export const getProjectById = async (req, res) => {
   const { id } = req.params;
@@ -64,9 +67,10 @@ export const getProjectById = async (req, res) => {
   }
 };
 
+// Update Project
 export const updateProjectById = async (req, res) => {
   const { id } = req.params;
-  const { name, description, url } = req.body;
+  const { name, description, url, keywords } = req.body;
 
   try {
     const project = await projectRepository.findOneBy({ id: parseInt(id) });
@@ -77,6 +81,7 @@ export const updateProjectById = async (req, res) => {
     project.name = name || project.name;
     project.description = description || project.description;
     project.url = url || project.url;
+    project.keywords = keywords || project.keywords; // Update keywords if provided
 
     await projectRepository.save(project);
     res.status(200).json(project);
