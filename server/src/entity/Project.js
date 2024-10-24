@@ -19,8 +19,12 @@ export const Project = new EntitySchema({
       type: String,
     },
     keywords: {
-      type: "simple-array", // Store as a comma-separated array
-      nullable: true,        // Allow null for existing projects
+      type: "simple-array",  // Keywords stored as a comma-separated string
+      nullable: true, // Make it nullable in case some projects don't have keywords
+    },
+    image: {
+      type: String, // Store the image path or URL
+      nullable: true, // Make it nullable in case some projects don't have images
     },
     createdAt: {
       type: "timestamp",

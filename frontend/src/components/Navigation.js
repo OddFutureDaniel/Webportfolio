@@ -57,16 +57,15 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
-        } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`} // Transparent over hero section
+        className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+          } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`} // Transparent over hero section
       >
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           {/* Your Name */}
           <span className="text-black dark:text-white font-extralight tracking-wide uppercase mr-48" style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
             Daniel Rogerson
           </span>
-          
+
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden">

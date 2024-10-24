@@ -2,31 +2,33 @@ import express from 'express';
 import {
   getProjects,
   createProject,
-  getProjectById,  // Restore getProjectById
+  getProjectById,
   updateProjectById,
   deleteProjectById,
   register,
   login,
   getUserById,
-  getUserByUsername
+  getUserByUsername,
+  upload // Import multer middleware for handling image uploads
 } from '../controllers/projectController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';  // Import the middleware
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Project Routes
-router.get('/projects', getProjects);              // Public: Get all projects
-router.get('/projects/:id', getProjectById);       // Public: Get project by ID (Restored)
-router.get('/users/:id', getUserById);             // Add this route for fetching user by ID
-router.get('/users/username/:username', getUserByUsername); // Add this route for fetching user by username
+router.get('/projects', getProjects);
+router.get('/projects/:id', getProjectById);
+router.get('/users/:id', getUserById);
+router.get('/users/username/:username', getUserByUsername);
 
 // Protected Routes (Require authentication via JWT)
-router.post('/projects', authMiddleware, createProject);         // Protected: Create a project
-router.put('/projects/:id', authMiddleware, updateProjectById);  // Protected: Update a project
-router.delete('/projects/:id', authMiddleware, deleteProjectById); // Protected: Delete a project
+
+router.put('/projects/:id', authMiddleware, upload, updateProjectById); 
+router.delete('/projects/:id', authMiddleware, deleteProjectById);
+router.post('/projects', upload, createProject);  // 'image' corresponds to the key in the form data
 
 // Authentication Routes
-router.post('/auth/register', register);  // Public: Register a new user
-router.post('/auth/login', login);        // Public: Login for existing user
+router.post('/auth/register', register);
+router.post('/auth/login', login);
 
 export default router;
