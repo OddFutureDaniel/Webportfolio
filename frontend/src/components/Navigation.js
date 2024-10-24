@@ -52,6 +52,10 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
     window.location.href = '/admin';  // Redirect to admin page
   };
 
+  const handleLinkClick = () => {
+    setMobileMenuOpen(false); // Close mobile menu when a link is clicked
+  };
+
   return (
     <>
       <header
@@ -64,7 +68,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
             Daniel Rogerson
           </span>
 
-          {/* Mobile Menu Button on the right */}
+          {/* Mobile Menu Button */}
           <div className="lg:hidden">
             <button
               type="button"
@@ -109,7 +113,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
         {/* Mobile Menu */}
         <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
           <div className="fixed inset-0 z-50" />
-          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white dark:bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full sm:max-w-xs overflow-y-auto bg-white dark:bg-gray-900 px-6 py-6 ring-1 ring-gray-900/10">
             <div className="flex items-center justify-between">
               <button
                 type="button"
@@ -123,11 +127,13 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
 
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10 dark:divide-gray-700">
+                {/* Mobile Navigation Links */}
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
+                      onClick={handleLinkClick}  // Close menu on link click
                       className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       {item.name}
@@ -135,15 +141,17 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
                   ))}
                 </div>
 
+                {/* Admin Link in Mobile View */}
                 <div className="py-6">
                   <button
-                    onClick={() => setIsLoginOpen(true)}
+                    onClick={() => { setIsLoginOpen(true); setMobileMenuOpen(false); }}  // Close menu and show login modal
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Admin
                   </button>
                 </div>
 
+                {/* Dark Mode Toggle in Mobile View */}
                 <div className="flex justify-center py-6">
                   <button
                     onClick={toggleDarkMode}
