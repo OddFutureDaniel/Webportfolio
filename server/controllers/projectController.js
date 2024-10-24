@@ -9,7 +9,7 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';  // Multer storag
 
 const projectRepository = AppDataSource.getRepository(Project);
 const userRepository = AppDataSource.getRepository(User);
-const SECRET_KEY = 'your_secret_key';  // Use the same secret key as before
+const SECRET_KEY = process.env.JWT_SECRET;   // Use the same secret key as before
 
 // Set up Cloudinary storage with Multer
 const storage = new CloudinaryStorage({

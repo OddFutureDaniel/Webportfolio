@@ -22,23 +22,21 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
     const handleScroll = () => {
       const currentScrollPos = window.scrollY;
 
-      // If scrolling down, hide the header, if scrolling up, show it
       if (currentScrollPos > lastScrollTop) {
         setIsVisible(false); // Scrolling down
       } else {
         setIsVisible(true); // Scrolling up
       }
 
-      // Detect if the scroll is past the Home section
       const homeSectionHeight = document.getElementById('home').offsetHeight;
-      const offset = 50; // Offset to trigger the blur earlier
+      const offset = 50;
       if (currentScrollPos >= homeSectionHeight - offset) {
-        setIsPastHome(true); // Scrolled past (with offset)
+        setIsPastHome(true);
       } else {
-        setIsPastHome(false); // Still in the home section
+        setIsPastHome(false);
       }
 
-      lastScrollTop = currentScrollPos <= 0 ? 0 : currentScrollPos; // Ensure it never goes negative
+      lastScrollTop = currentScrollPos <= 0 ? 0 : currentScrollPos;
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -49,8 +47,8 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
   }, []);
 
   const handleLogin = (token) => {
-    sessionStorage.setItem('authToken', token);  // Store the JWT token in session storage instead of local storage
-    setIsLoginOpen(false);  // Close login modal after successful login
+    sessionStorage.setItem('authToken', token);
+    setIsLoginOpen(false);
     window.location.href = '/admin';  // Redirect to admin page
   };
 
@@ -58,17 +56,16 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-          } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`} // Transparent over hero section
+          } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`}
       >
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           {/* Your Name */}
-          <span className="text-black dark:text-white font-extralight tracking-wide uppercase mr-48" style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
+          <span className="text-black dark:text-white font-extralight tracking-wide uppercase lg:mr-48" style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
             Daniel Rogerson
           </span>
 
-
-          {/* Mobile Menu Button */}
-          <div className="flex lg:hidden">
+          {/* Mobile Menu Button on the right */}
+          <div className="lg:hidden">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
@@ -90,9 +87,8 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
 
           {/* Admin Link and Dark Mode Toggle on the Right */}
           <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-6">
-            {/* Admin Link */}
             <button
-              onClick={() => setIsLoginOpen(true)}  // Show login modal on click
+              onClick={() => setIsLoginOpen(true)}
               className="text-sm font-semibold leading-6 text-gray-900 dark:text-white"
             >
               Admin <span aria-hidden="true">&rarr;</span>
@@ -127,7 +123,6 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
 
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10 dark:divide-gray-700">
-                {/* Mobile Navigation Links */}
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => (
                     <a
@@ -140,17 +135,15 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
                   ))}
                 </div>
 
-                {/* Admin Link in Mobile View */}
                 <div className="py-6">
                   <button
-                    onClick={() => setIsLoginOpen(true)}  // Show login modal on click
+                    onClick={() => setIsLoginOpen(true)}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Admin
                   </button>
                 </div>
 
-                {/* Centered Dark/Light Mode Toggle in Mobile View */}
                 <div className="flex justify-center py-6">
                   <button
                     onClick={toggleDarkMode}
