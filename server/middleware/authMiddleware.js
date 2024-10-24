@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-const SECRET_KEY = 'your_secret_key';  // Same secret key used for signing JWTs
+const SECRET_KEY = process.env.JWT_SECRET;  // Same secret key used for signing JWTs
 
 // Middleware function to verify the token
 export const authMiddleware = (req, res, next) => {
