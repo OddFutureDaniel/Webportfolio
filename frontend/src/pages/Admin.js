@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 function Admin() {
   const [projects, setProjects] = useState([]);
@@ -8,6 +9,8 @@ function Admin() {
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -126,6 +129,7 @@ function Admin() {
       setError('Failed to update project.');
     }
   };
+
   // Delete project logic
   const handleDeleteProject = async () => {
     if (!projectToDelete) return;
@@ -145,10 +149,28 @@ function Admin() {
     }
   };
 
+  // Add a "Back" button that navigates back to the homepage
+  const handleBackClick = () => {
+    navigate('/'); // Navigate to the homepage ("/")
+  };
+
   // Rendering the project details including keywords and image
   return (
     <div className="p-10">
-      <h2 className="text-3xl mb-6">Admin Dashboard</h2>
+      <div className="flex items-center justify-between mb-6">
+        {/* Back Button with Arrow */}
+        <button 
+          onClick={handleBackClick} 
+          className="text-black hover:underline flex items-center space-x-2"
+        >
+          <span className="text-2xl">←</span> {/* Left-facing arrow */}
+          <span>Back</span>
+        </button>
+
+        {/* Center the "Admin Dashboard" */}
+        <h2 className="text-3xl text-center flex-1">Admin Dashboard</h2>
+      </div>
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="mb-8">

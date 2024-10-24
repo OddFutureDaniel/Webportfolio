@@ -120,7 +120,7 @@ function About() {
                 Tools
               </h4>
               <ul className="list-none ml-5 text-[0.9rem] text-gray-700 dark:text-gray-300">
-                {['Github', 'Postman', 'Firebase'].map((skill, index) => (
+                {['Github', 'Postman', 'Firebase','Cloudinary'].map((skill, index) => (
                   <li
                     key={index}
                     className="transition duration-300 ease-in-out"
