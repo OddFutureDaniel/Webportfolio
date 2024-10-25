@@ -24,7 +24,7 @@ const LoginModal = ({ onClose }) => {
         return;
       }
   
-      console.log('Login successful, session data:', data); // Logs session data on success
+      // console.log('Login successful, session data:', data); // Logs session data on success
   
       // Store the session token if login is successful
       sessionStorage.setItem('authToken', data.session.access_token);
