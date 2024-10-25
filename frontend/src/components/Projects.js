@@ -21,8 +21,15 @@ function Projects() {
       try {
         const { data, error } = await supabase.from('projects').select('*');
         if (error) throw error;
-        console.log("Projects data:", data); // Log projects data
-        setProjects(data);
+
+        // Parse keywords from JSON string to array, if needed
+        const parsedProjects = data.map(project => ({
+          ...project,
+          keywords: typeof project.keywords === 'string' ? JSON.parse(project.keywords) : project.keywords,
+        }));
+        
+        console.log("Parsed Projects Data:", parsedProjects); // Log parsed data for verification
+        setProjects(parsedProjects);
       } catch (err) {
         console.error("Error fetching projects:", err);
         setError('Failed to load projects.');
@@ -74,7 +81,7 @@ function Projects() {
             className="block transform hover:scale-105 transition-transform duration-300 bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
           >
             <img
-              src={project.image}  // Ensure 'image' field is correctly stored in Supabase
+              src={project.image}
               alt={project.name}
               className="w-full h-48 object-cover"
             />
