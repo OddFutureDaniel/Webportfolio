@@ -21,6 +21,7 @@ function Projects() {
       try {
         const { data, error } = await supabase.from('projects').select('*');
         if (error) throw error;
+        console.log("Projects data:", data); // Log projects data
         setProjects(data);
       } catch (err) {
         console.error("Error fetching projects:", err);
@@ -85,7 +86,7 @@ function Projects() {
                 {project.description}
               </p>
               <div className="flex flex-wrap gap-2">
-                {Array.isArray(project.keywords) ? (
+                {Array.isArray(project.keywords) && project.keywords.length > 0 ? (
                   project.keywords.map((keyword, idx) => (
                     <span
                       key={idx}
