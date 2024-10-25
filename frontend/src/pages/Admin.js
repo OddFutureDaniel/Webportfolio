@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 function Admin() {
   const [projects, setProjects] = useState([]);
@@ -10,71 +10,81 @@ function Admin() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
+  // Fetch projects from Supabase
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
-        if (!token) {
-          throw new Error('No token found');
-        }
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*');
 
-        const response = await axios.get('http://localhost:5050/api/projects', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProjects(response.data);
+        if (error) throw error;
+        setProjects(data);
       } catch (err) {
         setError('Failed to fetch projects.');
-        console.error(err.response ? err.response.data : err.message);
+        console.error(err.message);
       }
     };
 
     fetchProjects();
   }, []);
 
-  // Creating new project logic
-  const handleCreateProject = async () => {
-    const { name, description, url, keywords, image } = newProject;
+  // Create a new project using Supabase
+  // handleCreateProject
+const handleCreateProject = async () => {
+  const { name, description, url, keywords, image } = newProject;
 
-    if (!name || !description || !url || !image) {
-      setError('All fields including image are required.');
-      return;
+  if (!name || !description || !url || !image) {
+    setError('All fields including image are required.');
+    return;
+  }
+
+  // Split keywords into an array
+  const formattedKeywords = Array.isArray(keywords)
+    ? keywords
+    : keywords.split(',').map((keyword) => keyword.trim()).filter(Boolean);
+
+  try {
+    let imageUrl;
+    if (image) {
+      const { data, error: uploadError } = await supabase.storage
+        .from('project-images')
+        .upload(`public/${Date.now()}_${image.name}`, image);
+
+      if (uploadError) throw uploadError;
+      imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/project-images/${data.path}`;
     }
 
-    try {
-      const token = sessionStorage.getItem('authToken');
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('description', description);
-      formData.append('url', url);
-      formData.append('keywords', keywords.split(',').map((keyword) => keyword.trim()));
-      formData.append('image', image);
-
-      const response = await axios.post('http://localhost:5050/api/projects', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+    const { data, error } = await supabase
+      .from('projects')
+      .insert([
+        {
+          name,
+          description,
+          url,
+          keywords: formattedKeywords,  // Store as an array
+          image: imageUrl,
         },
-      });
+      ]);
 
-      console.log("Project created successfully:", response.data); // Log the response
+    if (error) throw error;
 
-      // Update the projects list with the newly created project
-      setProjects([...projects, response.data]);  // Append the new project to the projects array
-      setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
-      setError(null);
-    } catch (err) {
-      console.error("Error creating project:", err.response ? err.response.data : err.message); // Log the error
-      setError('Failed to create project.');
-    }
-  };
+    setProjects([...projects, data[0]]);
+    setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
+    setError(null);
+  } catch (err) {
+    console.error("Error creating project:", err.message);
+    setError('Failed to create project.');
+  }
+};
 
-  // Editing project logic
+  // Edit project logic
   const handleEditProject = (project) => {
     const keywordsString = Array.isArray(project.keywords)
       ? project.keywords.join(', ')
-      : (project.keywords || '');  // Handle undefined or null
+      : (project.keywords || '');
 
     setEditingProject(project);
     setNewProject({
@@ -82,92 +92,94 @@ function Admin() {
       description: project.description,
       url: project.url,
       keywords: keywordsString,
-      image: null, // Reset image when editing
+      image: null,
     });
   };
 
-  // Updating project logic
+  // Update an existing project using Supabase
   const handleUpdateProject = async () => {
     if (!editingProject) return;
-
+  
     const { name, description, url, keywords, image } = newProject;
-
+  
     if (!name || !description || !url) {
       setError('All fields are required for updating.');
       return;
     }
-
+  
     try {
-      const token = sessionStorage.getItem('authToken');
-      const formData = new FormData();
-
-      formData.append('name', name);
-      formData.append('description', description);
-      formData.append('url', url);
-      formData.append('keywords', keywords.split(',').map((keyword) => keyword.trim()));
-
-      if (image) formData.append('image', image); // Append image only if updated
-
-      const response = await axios.put(`http://localhost:5050/api/projects/${editingProject.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', // Ensure this is set
-        },
-      });
-
-      const updatedProjects = projects.map((proj) =>
-        proj.id === editingProject.id ? response.data : proj
-      );
-
-      setProjects(updatedProjects);
+      let imageUrl = editingProject.image;
+      if (image) {
+        const { data: imageData, error: uploadError } = await supabase.storage
+          .from('project-images')
+          .upload(`public/${Date.now()}_${image.name}`, image);
+  
+        if (uploadError) throw uploadError;
+        imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/project-images/${imageData.path}`;
+      }
+  
+      const keywordArray = keywords.split(',').map((keyword) => keyword.trim());
+  
+      const { data, error } = await supabase
+        .from('projects')
+        .update({ name, description, url, keywords: keywordArray, image: imageUrl })
+        .eq('id', editingProject.id)
+        .select();  // Use `select` to get the updated row data
+  
+      if (error) throw error;
+  
+      if (!data || data.length === 0) {
+        console.error('Project update response data is null or empty.');
+        setError('Failed to update project.');
+        return;
+      }
+  
+      setProjects(projects.map((proj) => (proj.id === editingProject.id ? data[0] : proj)));
       setEditingProject(null);
       setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
       setError(null);
     } catch (err) {
-      // Log detailed error message
-      console.error('Error updating project:', err.response ? err.response.data : err.message);
+      console.error("Error updating project:", err.message);
       setError('Failed to update project.');
     }
   };
-
-  // Delete project logic
+  
+  // Delete a project using Supabase
   const handleDeleteProject = async () => {
     if (!projectToDelete) return;
 
     try {
-      const token = sessionStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5050/api/projects/${projectToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectToDelete.id);
+
+      if (error) throw error;
 
       setProjects(projects.filter((project) => project.id !== projectToDelete.id));
       setIsDeleteModalOpen(false);
       setProjectToDelete(null);
     } catch (err) {
       setError('Failed to delete project.');
-      console.error(err.response ? err.response.data : err.message);
+      console.error(err.message);
     }
   };
 
-  // Add a "Back" button that navigates back to the homepage
   const handleBackClick = () => {
-    navigate('/'); // Navigate to the homepage ("/")
+    navigate('/');
   };
 
-  // Rendering the project details including keywords and image
   return (
     <div className="p-10">
       <div className="flex items-center justify-between mb-6">
-        {/* Back Button with Arrow */}
         <button 
           onClick={handleBackClick} 
           className="text-black hover:underline flex items-center space-x-2"
         >
-          <span className="text-2xl">←</span> {/* Left-facing arrow */}
+          <span className="text-2xl">←</span>
           <span>Back</span>
         </button>
 
-        {/* Center the "Admin Dashboard" */}
         <h2 className="text-3xl text-center flex-1">Admin Dashboard</h2>
       </div>
 
@@ -221,7 +233,6 @@ function Admin() {
         </div>
       </div>
 
-      {/* Display Existing Projects */}
       <div>
         <h3 className="text-xl mb-4">Existing Projects</h3>
         <div className="space-y-6">
@@ -232,7 +243,7 @@ function Admin() {
               <p><strong>Keywords:</strong> {
                 Array.isArray(project.keywords)
                   ? project.keywords.join(', ')
-                  : 'No keywords'  // Handle the case where keywords is not an array
+                  : 'No keywords'
               }</p>
 
               <img
@@ -249,8 +260,8 @@ function Admin() {
                 </button>
                 <button
                   onClick={() => {
-                    setProjectToDelete(project); // Set the project to be deleted
-                    setIsDeleteModalOpen(true);  // Open the confirmation modal
+                    setProjectToDelete(project);
+                    setIsDeleteModalOpen(true);
                   }}
                   className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500"
                 >

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import LoginModal from './LoginModal';  // Import LoginModal component
+import LoginModal from './LoginModal';
 
 const navigation = [
   { name: 'Home', href: '#home' },
@@ -14,43 +14,19 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isPastHome, setIsPastHome] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false); // State for login modal
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // Track scroll direction and current section (to hide/show navbar)
   useEffect(() => {
     let lastScrollTop = 0;
     const handleScroll = () => {
       const currentScrollPos = window.scrollY;
-
-      if (currentScrollPos > lastScrollTop) {
-        setIsVisible(false); // Scrolling down
-      } else {
-        setIsVisible(true); // Scrolling up
-      }
-
-      const homeSectionHeight = document.getElementById('home').offsetHeight;
-      const offset = 50;
-      if (currentScrollPos >= homeSectionHeight - offset) {
-        setIsPastHome(true);
-      } else {
-        setIsPastHome(false);
-      }
-
+      setIsVisible(currentScrollPos < lastScrollTop || currentScrollPos === 0);
+      setIsPastHome(currentScrollPos >= document.getElementById('home').offsetHeight - 50);
       lastScrollTop = currentScrollPos <= 0 ? 0 : currentScrollPos;
     };
-
     window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogin = (token) => {
-    sessionStorage.setItem('authToken', token);
-    setIsLoginOpen(false);
-    window.location.href = '/admin';  // Redirect to admin page
-  };
 
   const handleLinkClick = () => {
     setMobileMenuOpen(false); // Close mobile menu when a link is clicked
@@ -63,116 +39,90 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
           } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`}
       >
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
-          {/* Your Name */}
-          <span className="text-black dark:text-white font-extralight tracking-wide uppercase lg:mr-48" style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
+          <span className={`text-black dark:text-white font-extralight tracking-wide uppercase ${mobileMenuOpen ? '' : 'lg:mr-48'}`} style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
             Daniel Rogerson
           </span>
 
-          {/* Mobile Menu Button */}
           <div className="lg:hidden">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-300"
+              className="-m-2.5 inline-flex items-center p-2.5 text-gray-700 dark:text-gray-300"
             >
-              <span className="sr-only">Open main menu</span>
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
             </button>
           </div>
 
-          {/* Desktop Navigation Links */}
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
-              <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
+              <a key={item.name} href={item.href} className="text-sm font-semibold text-gray-900 dark:text-white">
                 {item.name}
               </a>
             ))}
           </div>
 
-          {/* Admin Link and Dark Mode Toggle on the Right */}
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-6">
+          <div className="hidden lg:flex lg:items-center lg:gap-x-6">
             <button
               onClick={() => setIsLoginOpen(true)}
-              className="text-sm font-semibold leading-6 text-gray-900 dark:text-white"
+              className="text-sm font-semibold text-gray-900 dark:text-white"
             >
               Admin <span aria-hidden="true">&rarr;</span>
             </button>
 
-            {/* Dark/Light Mode Toggle */}
-            <button onClick={toggleDarkMode} className="flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-300">
-              {isDarkMode ? (
-                <SunIcon className="h-6 w-6" aria-hidden="true" />
-              ) : (
-                <MoonIcon className="h-6 w-6" aria-hidden="true" />
-              )}
-              <span className="sr-only">Toggle dark mode</span>
+            <button onClick={toggleDarkMode} className="p-2.5 text-gray-700 dark:text-gray-300">
+              {isDarkMode ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
             </button>
           </div>
         </nav>
 
-        {/* Mobile Menu */}
         <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
           <div className="fixed inset-0 z-50" />
-          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full sm:max-w-xs overflow-y-auto bg-white dark:bg-gray-900 px-6 py-6 ring-1 ring-gray-900/10">
+          <DialogPanel className={`fixed inset-y-0 right-0 z-50 w-full sm:max-w-xs overflow-y-auto ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} p-6 ring-1 ring-gray-900/10`}>
             <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="-m-2.5 rounded-md p-2.5 text-gray-700 dark:text-gray-300"
-              >
-                <span className="sr-only">Close menu</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-300">
                 <XMarkIcon aria-hidden="true" className="h-6 w-6" />
               </button>
             </div>
-
-            <div className="mt-6 flow-root">
-              <div className="-my-6 divide-y divide-gray-500/10 dark:divide-gray-700">
-                {/* Mobile Navigation Links */}
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      onClick={handleLinkClick}  // Close menu on link click
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
-                    >
-                      {item.name}
-                    </a>
-                  ))}
-                </div>
-
-                {/* Admin Link in Mobile View */}
-                <div className="py-6">
-                  <button
-                    onClick={() => { setIsLoginOpen(true); setMobileMenuOpen(false); }}  // Close menu and show login modal
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
+            <div className="mt-6">
+              <div className="space-y-2 py-6">
+                {navigation.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={handleLinkClick}  // Close menu on link click
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Admin
-                  </button>
-                </div>
+                    {item.name}
+                  </a>
+                ))}
+              </div>
 
-                {/* Dark Mode Toggle in Mobile View */}
-                <div className="flex justify-center py-6">
-                  <button
-                    onClick={toggleDarkMode}
-                    className="flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-300"
-                  >
-                    {isDarkMode ? (
-                      <SunIcon className="h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <MoonIcon className="h-6 w-6" aria-hidden="true" />
-                    )}
-                    <span className="sr-only">Toggle dark mode</span>
-                  </button>
-                </div>
+              <div className="py-6">
+                <button
+                  onClick={() => { setIsLoginOpen(true); setMobileMenuOpen(false); }}
+                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Admin
+                </button>
+              </div>
+
+              {/* Dark Mode Toggle (stays open in mobile) */}
+              <div className="flex justify-center py-6">
+                <button
+                  onClick={() => {
+                    toggleDarkMode();
+                  }}
+                  className="p-2.5 text-gray-700 dark:text-gray-300"
+                >
+                  {isDarkMode ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
+                </button>
               </div>
             </div>
           </DialogPanel>
         </Dialog>
       </header>
 
-      {/* Render the LoginModal only when isLoginOpen is true */}
-      {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} onLogin={handleLogin} />}
+      {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} onLogin={(token) => { sessionStorage.setItem('authToken', token); setIsLoginOpen(false); window.location.href = '/admin'; }} />}
     </>
   );
 }

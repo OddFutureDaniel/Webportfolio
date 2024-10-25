@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './components/Home';
 import About from './components/About';
 import Projects from './components/Projects';
@@ -11,15 +11,16 @@ import LoginModal from './components/LoginModal';
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem('jwtToken')); // Store JWT token
+  const [token, setToken] = useState(sessionStorage.getItem('authToken')); // Fetch token from session storage
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleLogin = (jwtToken) => {
-    setToken(jwtToken); // Store token after login
-    localStorage.setItem('jwtToken', jwtToken);
+  // Updated handleLogin function
+  const handleLogin = (supabaseToken) => {
+    setToken(supabaseToken); // Store token after login
+    sessionStorage.setItem('authToken', supabaseToken); // Save in session storage
   };
 
   const openLoginModal = () => {
@@ -55,10 +56,10 @@ function App() {
             }
           />
 
-          {/* Route for Admin page */}
+          {/* Route for Admin page with token verification */}
           <Route
             path="/admin"
-            element={token ? <Admin /> : <Home />} // Show Admin page if authenticated, otherwise Home
+            element={token ? <Admin /> : <Navigate to="/" />} // Redirect if not authenticated
           />
         </Routes>
       </div>
