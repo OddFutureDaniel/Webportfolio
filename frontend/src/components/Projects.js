@@ -28,7 +28,7 @@ function Projects() {
           keywords: typeof project.keywords === 'string' ? JSON.parse(project.keywords) : project.keywords,
         }));
         
-        console.log("Parsed Projects Data:", parsedProjects); // Log parsed data for verification
+        // console.log("Parsed Projects Data:", parsedProjects); // Log parsed data for verification
         setProjects(parsedProjects);
       } catch (err) {
         console.error("Error fetching projects:", err);

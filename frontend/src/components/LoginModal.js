@@ -10,7 +10,7 @@ const LoginModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt with:', { email, password }); // Logs email and password for debugging
+    // console.log('Login attempt with:', { email, password }); // Logs email and password for debugging
   
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
