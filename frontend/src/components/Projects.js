@@ -5,6 +5,9 @@ import { InformationCircleIcon } from '@heroicons/react/24/solid';
 // Configure Supabase client
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("Supabase URL or Anon Key is missing!");
+}
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function Projects() {
