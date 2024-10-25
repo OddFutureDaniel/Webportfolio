@@ -16,12 +16,19 @@ function Admin() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*');
+        const { data, error } = await supabase.from('projects').select('*');
 
         if (error) throw error;
-        setProjects(data);
+
+        // Parse keywords as an array if stored as JSON strings
+        const parsedProjects = data.map((project) => ({
+          ...project,
+          keywords: Array.isArray(project.keywords)
+            ? project.keywords
+            : JSON.parse(project.keywords || '[]'),
+        }));
+        
+        setProjects(parsedProjects);
       } catch (err) {
         setError('Failed to fetch projects.');
         console.error(err.message);
@@ -31,60 +38,53 @@ function Admin() {
     fetchProjects();
   }, []);
 
-  // Create a new project using Supabase
-  // handleCreateProject
-const handleCreateProject = async () => {
-  const { name, description, url, keywords, image } = newProject;
+  // Handle project creation
+  const handleCreateProject = async () => {
+    const { name, description, url, keywords, image } = newProject;
 
-  if (!name || !description || !url || !image) {
-    setError('All fields including image are required.');
-    return;
-  }
-
-  // Split keywords into an array
-  const formattedKeywords = Array.isArray(keywords)
-    ? keywords
-    : keywords.split(',').map((keyword) => keyword.trim()).filter(Boolean);
-
-  try {
-    let imageUrl;
-    if (image) {
-      const { data, error: uploadError } = await supabase.storage
-        .from('project-images')
-        .upload(`public/${Date.now()}_${image.name}`, image);
-
-      if (uploadError) throw uploadError;
-      imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/project-images/${data.path}`;
+    if (!name || !description || !url || !image) {
+      setError('All fields including image are required.');
+      return;
     }
 
-    const { data, error } = await supabase
-      .from('projects')
-      .insert([
+    const formattedKeywords = keywords.split(',').map((keyword) => keyword.trim());
+
+    try {
+      let imageUrl;
+      if (image) {
+        const { data, error: uploadError } = await supabase.storage
+          .from('project-images')
+          .upload(`public/${Date.now()}_${image.name}`, image);
+
+        if (uploadError) throw uploadError;
+        imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/project-images/${data.path}`;
+      }
+
+      const { data, error } = await supabase.from('projects').insert([
         {
           name,
           description,
           url,
-          keywords: formattedKeywords,  // Store as an array
+          keywords: formattedKeywords,
           image: imageUrl,
         },
       ]);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    setProjects([...projects, data[0]]);
-    setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
-    setError(null);
-  } catch (err) {
-    console.error("Error creating project:", err.message);
-    setError('Failed to create project.');
-  }
-};
+      setProjects([...projects, data[0]]);
+      setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
+      setError(null);
+    } catch (err) {
+      console.error("Error creating project:", err.message);
+      setError('Failed to create project.');
+    }
+  };
 
-  // Edit project logic
   const handleEditProject = (project) => {
     const keywordsString = Array.isArray(project.keywords)
       ? project.keywords.join(', ')
-      : (project.keywords || '');
+      : '';
 
     setEditingProject(project);
     setNewProject({
@@ -96,44 +96,43 @@ const handleCreateProject = async () => {
     });
   };
 
-  // Update an existing project using Supabase
   const handleUpdateProject = async () => {
     if (!editingProject) return;
-  
+
     const { name, description, url, keywords, image } = newProject;
-  
+
     if (!name || !description || !url) {
       setError('All fields are required for updating.');
       return;
     }
-  
+
     try {
       let imageUrl = editingProject.image;
       if (image) {
         const { data: imageData, error: uploadError } = await supabase.storage
           .from('project-images')
           .upload(`public/${Date.now()}_${image.name}`, image);
-  
+
         if (uploadError) throw uploadError;
         imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/project-images/${imageData.path}`;
       }
-  
+
       const keywordArray = keywords.split(',').map((keyword) => keyword.trim());
-  
+
       const { data, error } = await supabase
         .from('projects')
         .update({ name, description, url, keywords: keywordArray, image: imageUrl })
         .eq('id', editingProject.id)
-        .select();  // Use `select` to get the updated row data
-  
+        .select();
+
       if (error) throw error;
-  
+
       if (!data || data.length === 0) {
         console.error('Project update response data is null or empty.');
         setError('Failed to update project.');
         return;
       }
-  
+
       setProjects(projects.map((proj) => (proj.id === editingProject.id ? data[0] : proj)));
       setEditingProject(null);
       setNewProject({ name: '', description: '', url: '', keywords: '', image: null });
@@ -143,8 +142,7 @@ const handleCreateProject = async () => {
       setError('Failed to update project.');
     }
   };
-  
-  // Delete a project using Supabase
+
   const handleDeleteProject = async () => {
     if (!projectToDelete) return;
 
@@ -245,7 +243,6 @@ const handleCreateProject = async () => {
                   ? project.keywords.join(', ')
                   : 'No keywords'
               }</p>
-
               <img
                 src={project.image}
                 alt={project.name}
