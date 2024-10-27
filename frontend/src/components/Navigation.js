@@ -39,7 +39,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
           } ${isPastHome ? 'backdrop-blur-md bg-white/70 dark:bg-gray-900/70' : 'bg-transparent'}`}
       >
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
-          <span className={`text-black dark:text-white font-extralight tracking-wide uppercase ${mobileMenuOpen ? '' : 'lg:mr-48'}`} style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
+          <span className={`text-black dark:text-white font-extralight tracking-wide uppercase ${mobileMenuOpen ? '' : 'lg:mr-30'}`} style={{ fontSize: '30px', letterSpacing: '1.5px' }}>
             Daniel Rogerson
           </span>
 
@@ -47,7 +47,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="-m-2.5 inline-flex items-center p-2.5 text-gray-700 dark:text-gray-300"
+              className="-m-2.5 inline-flex items-center p-2.5 text-black dark:text-gray-300"
             >
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
             </button>

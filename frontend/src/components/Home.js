@@ -18,7 +18,7 @@ function Home() {
           Welcome to My Portfolio
         </h1>
         <p className="mt-8 text-lg leading-8 text-gray-300 sm:text-xl font-roboto-slab">
-          Discover my projects, experience, and skills. Let's create something amazing together!
+        A design-minded front-end developer focused on building beautiful interfaces & experiences 
         </p>
 
         {/* Call to Action Buttons */}
