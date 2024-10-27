@@ -79,7 +79,7 @@ function Navigation({ isDarkMode, toggleDarkMode }) {
           <div className="fixed inset-0 z-50" />
           <DialogPanel className={`fixed inset-y-0 right-0 z-50 w-full sm:max-w-xs overflow-y-auto ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} p-6 ring-1 ring-gray-900/10`}>
             <div className="flex items-center justify-between">
-              <button onClick={() => setMobileMenuOpen(false)} className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-300">
+              <button onClick={() => setMobileMenuOpen(false)} className="-m-2.5 p-2.5 text-black dark:text-gray-300">
                 <XMarkIcon aria-hidden="true" className="h-6 w-6" />
               </button>
             </div>
