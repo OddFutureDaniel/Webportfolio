@@ -17,7 +17,7 @@ function Home() {
         <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-7xl">
           Welcome to My Portfolio
         </h1>
-        <p className="mt-8 text-lg leading-8 text-gray-300 sm:text-xl font-roboto-slab">
+        <p className="mt-8 text-lg leading-8 mx-6 text-gray-300 sm:text-xl font-roboto-slab">
         A design-minded front-end developer focused on building beautiful interfaces & experiences 
         </p>
 
