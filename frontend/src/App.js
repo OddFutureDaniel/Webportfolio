@@ -51,7 +51,7 @@ function AppContent({ isDarkMode, toggleDarkMode, isLoginModalOpen, openLoginMod
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [token, setToken] = useState(sessionStorage.getItem('authToken'));
 
